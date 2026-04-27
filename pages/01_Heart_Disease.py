@@ -7,11 +7,19 @@ import joblib
 import torch
 import torch.nn as nn
 from sklearn.metrics import confusion_matrix, roc_curve, auc
+from utils.theme import apply_theme
 
-# =============================================================================
+#  =============================================================================
 # PAGE CONFIG
 # =============================================================================
 st.set_page_config(page_title="Heart Disease Predictor", page_icon="🫀", layout="wide")
+
+apply_theme(
+    primary    = "#e91e8c",
+    secondary  = "#e45a94",
+    background = "#f7c4d5",
+    text       = "#880e4f"
+)
 
 st.markdown("""
 <style>
@@ -56,17 +64,17 @@ class MLP(nn.Module):
 @st.cache_resource
 def load_model():
     m = MLP(input_dim=18)
-    m.load_state_dict(torch.load("ANN/models/heart_mlp.pth", map_location="cpu"))
+    m.load_state_dict(torch.load("MLP/models/heart_mlp.pth", map_location="cpu"))
     m.eval()
     return m
 
 @st.cache_resource
 def load_scaler():
-    return joblib.load("ANN/models/scaler.pkl")
+    return joblib.load("MLP/models/scaler.pkl")
 
 @st.cache_resource
 def load_training_data():
-    return joblib.load("ANN/plots/training_data.pkl")
+    return joblib.load("MLP/plots/training_data.pkl")
 
 model  = load_model()
 scaler = load_scaler()
@@ -75,7 +83,7 @@ data   = load_training_data()
 # =============================================================================
 # HEADER
 # =============================================================================
-st.title("🫀 Heart Disease Risk Predictor")
+st.title("Heart Disease Risk Predictor")
 st.markdown("<p style='color:#ad1457; font-size:1.1rem;'>An MLP-based clinical decision support tool trained on the UCI Heart Disease dataset.</p>", unsafe_allow_html=True)
 st.divider()
 

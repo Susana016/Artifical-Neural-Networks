@@ -188,8 +188,8 @@ for epoch in range(100):
 # Restore best weights
 model.load_state_dict(best_weights)
 
-torch.save(model.state_dict(), "ANN/models/heart_mlp.pth")
-joblib.dump(scaler, "ANN/models/scaler.pkl")
+torch.save(model.state_dict(), "MLP/models/heart_mlp.pth")
+joblib.dump(scaler, "MLP/models/scaler.pkl")
 
 # Plot training curves
 plt.figure(figsize=(12, 4))
@@ -205,7 +205,7 @@ plt.plot(val_accs,   label='Val Acc')
 plt.title("Accuracy")
 plt.legend()
 plt.tight_layout()
-plt.savefig("ANN/plots/training_curves.png", dpi=150, bbox_inches='tight')
+plt.savefig("MLP/plots/training_curves.png", dpi=150, bbox_inches='tight')
 plt.show()
 
 

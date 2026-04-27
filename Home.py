@@ -1,6 +1,14 @@
 import streamlit as st
+from utils.theme import apply_theme
 
 st.set_page_config(page_title="Neural Network Explorer", page_icon="🧠", layout="wide")
+
+apply_theme(
+    primary    = "#1e88e5",
+    secondary  = "#1565c0",
+    background = "#f0f7ff",
+    text       = "#0d47a1"
+)
 
 st.markdown("""
 <style>
@@ -21,7 +29,7 @@ st.markdown("""
 # HEADER
 # =============================================================================
 st.title("🧠 Neural Network Explorer")
-st.markdown("<p style='color:#ad1457; font-size:1.1rem;'>A collection of neural network models built with PyTorch. Select a model below to explore predictions and training details.</p>", unsafe_allow_html=True)
+st.markdown(f"<p style='font-size:1.1rem;'>A collection of neural network models built with PyTorch. Select a model below to explore predictions and training details.</p>", unsafe_allow_html=True)
 st.divider()
 
 # =============================================================================
@@ -46,11 +54,10 @@ card_style = """
     box-shadow: 0 8px 24px rgba(194,24,91,0.18);
 }
 .card-icon   { font-size: 2.8rem; margin-bottom: 0.5rem; }
-.card-title  { font-size: 1.4rem; font-weight: 800; color: #c2185b; margin-bottom: 0.8rem; }
+.card-title  { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.8rem; }
 .card-badge  {
     display: inline-block;
     background: #fce4ec;
-    color: #880e4f;
     font-size: 0.75rem;
     font-weight: 700;
     padding: 0.2rem 0.7rem;
@@ -64,7 +71,6 @@ card_style = """
     border-radius: 10px;
     padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
-    color: #880e4f;
     font-weight: 600;
 }
 .card-footer { font-size: 0.8rem; color: #aaa; }
