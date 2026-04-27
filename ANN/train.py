@@ -24,7 +24,7 @@ X = heart_disease.data.features
 y = heart_disease.data.targets
 
 # =============================================================================
-# STEP 1 — EXPLORE
+# STEP 1 — EXPLORE DATA
 # =============================================================================
 df = X.copy()
 df['target'] = y
@@ -209,7 +209,6 @@ plt.savefig("ANN/plots/training_curves.png", dpi=150, bbox_inches='tight')
 plt.show()
 
 
-
 # =============================================================================
 # STEP 9 — EVALUATE
 # =============================================================================
@@ -287,14 +286,3 @@ joblib.dump({
     "y_test":       y_test.tolist(),
     "y_pred_prob":  y_pred_prob.tolist()
 }, "ANN/plots/training_data.pkl")
-
-# =============================================================================
-# STEP 11 — TUNE (starting points)
-# =============================================================================
-# Things to try if results are underwhelming:
-# - Increase/decrease layer sizes (e.g. 128 -> 64 -> 32)
-# - Adjust Dropout rate (try 0.2 or 0.4)
-# - Lower learning rate (e.g. 0.0005)
-# - Increase patience in early stopping
-# - Add a third hidden layer
-# - Try nn.LeakyReLU() instead of nn.ReLU()

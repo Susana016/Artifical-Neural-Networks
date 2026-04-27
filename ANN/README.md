@@ -42,6 +42,7 @@ The sigmoid output produces a probability between 0 and 1.
 From the repository root:
 
 ```powershell
+python ANN/Heart_Disease_Detection.py
 streamlit run ANN/app.py
 ```
 

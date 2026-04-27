@@ -6,13 +6,10 @@ import seaborn as sns
 import joblib
 import torch
 import torch.nn as nn
-from sklearn.metrics import (
-    confusion_matrix, roc_curve, auc,
-    classification_report, roc_auc_score
-)
+from sklearn.metrics import confusion_matrix, roc_curve, auc
 
 # =============================================================================
-# PAGE CONFIG — must be first
+# PAGE CONFIG
 # =============================================================================
 st.set_page_config(page_title="Heart Disease Predictor", page_icon="🫀", layout="wide")
 
@@ -76,31 +73,21 @@ scaler = load_scaler()
 data   = load_training_data()
 
 # =============================================================================
-# SESSION STATE — track current page
+# HEADER
 # =============================================================================
-if "page" not in st.session_state:
-    st.session_state.page = "predict"
-
-# =============================================================================
-# HEADER + NAV
-# =============================================================================
-st.title("Heart Disease Risk Predictor")
+st.title("🫀 Heart Disease Risk Predictor")
 st.markdown("<p style='color:#ad1457; font-size:1.1rem;'>An MLP-based clinical decision support tool trained on the UCI Heart Disease dataset.</p>", unsafe_allow_html=True)
-with st.sidebar:
-    st.markdown("## Navigation")
-    st.markdown("---")
-    if st.button("Predict", type="primary" if st.session_state.page == "predict" else "secondary", use_container_width=True):
-        st.session_state.page = "predict"
-    if st.button("Model Details", type="primary" if st.session_state.page == "details" else "secondary", use_container_width=True):
-        st.session_state.page = "details"
-    st.markdown("---")
-    st.caption("Built with PyTorch + Streamlit\nUCI Heart Disease Dataset")
+st.divider()
 
 # =============================================================================
-# PAGE: PREDICT
+# TABS
 # =============================================================================
-if st.session_state.page == "predict":
+tab1, tab2 = st.tabs(["Predict", "Model Details"])
 
+# =============================================================================
+# TAB 1: PREDICT
+# =============================================================================
+with tab1:
     st.subheader("Patient Data")
     st.markdown("Adjust the values below to match the patient's clinical profile.")
 
@@ -129,7 +116,6 @@ if st.session_state.page == "predict":
         thal     = st.selectbox("Thal", [1, 2, 3],
                        help="1=Normal, 2=Fixed Defect, 3=Reversible Defect")
 
-    # --- Preprocess ---
     def preprocess(age, sex, cp, trestbps, chol, fbs, restecg,
                    thalach, exang, oldpeak, slope, ca, thal):
         sex_val = 1 if sex == "Male" else 0
@@ -167,22 +153,20 @@ if st.session_state.page == "predict":
         st.progress(prob)
 
         if prob >= 0.5:
-            st.markdown("**Prediction:** <span style='color:#e91e8c; font-weight:700; font-size:1.2rem'> Disease Likely</span>", unsafe_allow_html=True)
+            st.markdown("**Prediction:** <span style='color:#e91e8c; font-weight:700; font-size:1.2rem'>⚠️ Disease Likely</span>", unsafe_allow_html=True)
             st.warning("This patient shows elevated risk indicators. Clinical follow-up recommended.")
         else:
-            st.markdown("**Prediction:** <span style='color:#2e7d32; font-weight:700; font-size:1.2rem'> Low Risk</span>", unsafe_allow_html=True)
+            st.markdown("**Prediction:** <span style='color:#2e7d32; font-weight:700; font-size:1.2rem'>✅ Low Risk</span>", unsafe_allow_html=True)
             st.success("This patient shows low risk indicators based on the provided data.")
 
-        st.caption("⚠ This tool is for educational purposes only and is not a substitute for medical advice.")
+        st.caption("⚠️ This tool is for educational purposes only and is not a substitute for medical advice.")
 
 # =============================================================================
-# PAGE: MODEL DETAILS
+# TAB 2: MODEL DETAILS
 # =============================================================================
-elif st.session_state.page == "details":
+with tab2:
+    st.subheader("Model Details")
 
-    st.subheader("📊 Model Details")
-
-    # --- Model Summary ---
     with st.expander("🧠 Architecture", expanded=True):
         st.markdown("""
         | Layer | Type | Details |
@@ -196,10 +180,10 @@ elif st.session_state.page == "details":
         **Optimizer:** Adam · **Learning Rate:** 0.0005 · **Loss:** Binary Cross-Entropy · **Early Stopping Patience:** 15
         """)
 
-    # --- Dataset Summary ---
     with st.expander("📁 Dataset", expanded=False):
         st.markdown("""
-        **Source:** UCI Heart Disease Dataset (Cleveland subset) via `ucimlrepo`
+        **Source:** UCI Heart Disease Dataset (Cleveland subset) via
+        <span style='color:#e91e8c; font-weight:700;'>ucimlrepo</span>
 
         | Property | Value |
         |---|---|
@@ -212,27 +196,25 @@ elif st.session_state.page == "details":
         Categorical features `cp`, `restecg`, `slope`, and `thal` were one-hot encoded.
         Missing values imputed with median (continuous) and mode (categorical).
         Features scaled with `StandardScaler` fit on training data only.
-        """)
+        """, unsafe_allow_html=True)
 
-    # --- Metrics Summary ---
     with st.expander("📈 Performance Metrics", expanded=True):
-        col1, col2, col3, col4 = st.columns(4)
-        y_pred  = (np.array(data['y_pred_prob']) >= 0.5).astype(int)
+        y_pred      = (np.array(data['y_pred_prob']) >= 0.5).astype(int)
         fpr, tpr, _ = roc_curve(data['y_test'], data['y_pred_prob'])
         roc_auc_val = auc(fpr, tpr)
-        acc = np.mean(np.array(y_pred) == np.array(data['y_test']))
+        acc         = np.mean(np.array(y_pred) == np.array(data['y_test']))
 
-        col1.metric("Accuracy",  f"{acc:.1%}")
-        col2.metric("AUC-ROC",   f"{roc_auc_val:.3f}")
-        col3.metric("CV Mean AUC", "0.896")
-        col4.metric("CV Std",    "±0.030")
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Accuracy",    f"{acc:.1%}")
+        c2.metric("AUC-ROC",     f"{roc_auc_val:.3f}")
+        c3.metric("CV Mean AUC", "0.896")
+        c4.metric("CV Std",      "±0.030")
 
     st.divider()
 
-    # --- Plots ---
-    tab1, tab2, tab3 = st.tabs(["📉 Training Curves", "🔲 Confusion Matrix", "📐 ROC Curve"])
+    plot_tab1, plot_tab2, plot_tab3 = st.tabs(["📉 Training Curves", "🔲 Confusion Matrix", "📐 ROC Curve"])
 
-    with tab1:
+    with plot_tab1:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
         fig.patch.set_facecolor('#fff0f5')
         ax1.plot(data['train_losses'], color='#e91e8c', label='Train Loss')
@@ -251,7 +233,7 @@ elif st.session_state.page == "details":
         st.pyplot(fig)
         st.caption("Dashed line = validation. Early stopping restored best weights before overfitting.")
 
-    with tab2:
+    with plot_tab2:
         cm = confusion_matrix(data['y_test'], y_pred)
         fig, ax = plt.subplots(figsize=(5, 4))
         fig.patch.set_facecolor('#fff0f5')
@@ -271,7 +253,7 @@ elif st.session_state.page == "details":
         c3.metric("False Positives", fp, delta=f"-{fp} misclassified", delta_color="inverse")
         c4.metric("False Negatives", fn, delta=f"-{fn} missed cases",  delta_color="inverse")
 
-    with tab3:
+    with plot_tab3:
         fig, ax = plt.subplots(figsize=(5, 4))
         fig.patch.set_facecolor('#fff0f5')
         ax.set_facecolor('#fce4ec')
